@@ -8,10 +8,10 @@
 - **Scope (v1)**:
   - **Kademlia-only**, using the existing `NetworkSimulator` with virtual time.
   - Read-only, built **on top of** the current implementation (no protocol changes).
-  - Implemented as a **Python script or Jupyter notebook** that:
+  - Implemented as a **single, simple Python script** (e.g. `scripts/viz_kademlia_latency.py`) that:
     - Runs the Kademlia benchmark across multiple N.
     - Collects detailed lookup traces.
-    - Produces static plots (matplotlib / seaborn).
+    - Produces static, publication-ready plots (matplotlib, seaborn if needed).
 - **Out of scope (v1)**:
   - Chord/Pastry visualizations.
   - Real network stack, multi-process simulation, or interactive web UI.
@@ -38,7 +38,7 @@ For each network size \(N\) (e.g. 10, 20, 50, 100, 200), the tool will:
       - `buckets` — sizes and contents of `node.buckets`.
       - Possibly a few example node IDs per bucket.
 
-The tool may hold this in memory (list of dicts) or persist to JSON/CSV for offline analysis.
+**Data lifecycle**: Recompute on each run. The script holds traces in memory (list of dicts) only; no cached JSON/CSV. Each run regenerates all data and plots so that results stay robust and reflect the current code and parameters.
 
 ### 3. Visualizations
 
@@ -90,25 +90,28 @@ The tool may hold this in memory (list of dicts) or persist to JSON/CSV for offl
 #### 4.1 Technology Choices
 
 - **Language**: Python (same as the DHT implementation).
-- **Visualization**: matplotlib and/or seaborn.
-- **Form factor**:
-  - Option A: CLI script, e.g. `scripts/viz_kademlia_latency.py`.
-  - Option B: Jupyter notebook, e.g. `notebooks/kademlia_latency_viz.ipynb`.
+- **Visualization**: matplotlib; seaborn only if needed for distribution plots (e.g. boxplots).
+- **Form factor**: A single **CLI script**, e.g. `scripts/viz_kademlia_latency.py`. No Jupyter notebook in v1.
+- **Network sizes N**: Use the same set as the benchmark: **N ∈ [10, 20, 50, 100, 200]**.
+- **Runtime**: No strict limit; robustness and correctness matter more than speed.
 
-#### 4.2 High-Level Workflow
+#### 4.2 Recompute on Each Run
+
+- Every script run **recomputes all data**: for each N, build a fresh network, run the lookups, record traces, then aggregate and plot.
+- **No cached data files**; plots are always generated from newly run benchmarks.
+- **Cost (typical)**: With ~200 lookups per N and N = 10–200, total runtime is on the order of **1–3 seconds**; memory stays small (traces are a few MB at most). Recompute is cheap and keeps the tool simple and robust.
+
+#### 4.3 High-Level Workflow
 
 1. **Benchmark run**
-   - For each N in a predefined list:
-     - Build the network with `NetworkSimulator(per_hop_delay=1.0)`.
-     - Run a fixed number of lookups.
-     - Record metrics and structures as described in Section 2.
+   - For each N in `[10, 20, 50, 100, 200]`:
+     - Build a fresh Kademlia network with `NetworkSimulator(per_hop_delay=1.0)`.
+     - Run a fixed number of lookups (e.g. 200).
+     - Record metrics and structures as described in Section 2 (in memory only).
 2. **Data aggregation**
-   - Group by N, compute summary statistics:
-     - Mean, median, p95 latency and hop count.
+   - Group by N, compute summary statistics (mean, median, p95 latency and hop count).
 3. **Plotting**
-   - Generate the visualizations from Section 3 into:
-     - On-screen windows (interactive), and/or
-     - Saved image files (e.g. `figures/kademlia_latency_N.png`).
+   - Generate the visualizations from Section 3 and **save** them as image files (e.g. `figures/kademlia_latency_scaling.png`) for use in the paper. Optionally show on-screen.
 
 ### 5. Future Extensions (Optional)
 
