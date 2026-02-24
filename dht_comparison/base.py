@@ -27,10 +27,23 @@ class NetworkSimulator:
     All nodes live in the same Python process and communicate via direct
     method calls.  The simulator acts as a registry so any node can
     reference any other node by ID.
+
+    Optional virtual time: set per_hop_delay > 0 to simulate latency.
+    Protocols that support it call advance_time() each logical hop/round
+    so that simulated_latency = (end virtual_time - start virtual_time)
+    per lookup can be measured.
     """
 
-    def __init__(self):
+    def __init__(self, per_hop_delay: float = 0.0):
         self.nodes: dict[int, Any] = {}
+        self.virtual_time: float = 0.0
+        self.per_hop_delay: float = per_hop_delay
+
+    def advance_time(self, delta: Optional[float] = None) -> None:
+        """Advance simulated time by *delta* (default per_hop_delay)."""
+        if delta is None:
+            delta = self.per_hop_delay
+        self.virtual_time += delta
 
     def register(self, node: "DHTNode"):
         self.nodes[node.node_id] = node

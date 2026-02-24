@@ -98,6 +98,10 @@ class KademliaNode(DHTNode):
                 break
 
             hops += 1
+            if getattr(self.network, "per_hop_delay", 0) > 0:
+                advance = getattr(self.network, "advance_time", None)
+                if advance is not None:
+                    advance()
             found_new = False
 
             for nid in to_query:
