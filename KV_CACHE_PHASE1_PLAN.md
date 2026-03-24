@@ -135,14 +135,22 @@ model.
 - **Code:** The Phase 1 implementation lives in **`scripts/kv_cache_phase1_gpt2.py`**. It:
   - Runs GPT-2 with `use_cache=True`.
   - Prints layer-wise KV shapes and sizes.
-  - Emits a simple report (stdout and CSV-style table) of KV size vs sequence length.
+  - Emits CSVs, figures, and a markdown writeup under `phase1_outputs/`.
 
   **How to run** (from the repo root):
 
   ```bash
-  pip install -r requirements.txt
+  python -m pip install -r requirements.txt
   python scripts/kv_cache_phase1_gpt2.py
   ```
+
+  **Generated outputs**:
+  - `phase1_outputs/GPT-2-output.txt`
+  - `phase1_outputs/gpt2_kv_stats.csv`
+  - `phase1_outputs/gpt2_kv_layer_stats.csv`
+  - `phase1_outputs/KV_CACHE_PHASE1_RESULTS.md`
+  - `phase1_outputs/figures/gpt2_total_kv_vs_seq.png`
+  - `phase1_outputs/figures/gpt2_kv_per_token_vs_seq.png`
 
 - **Doc:** A short summary (1–2 pages or section) with:
   - The empirical numbers for GPT-2.
