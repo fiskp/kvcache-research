@@ -99,7 +99,7 @@ Known measured TinyLLaMA profile from Phase 2:
 
 - `S1` variants: `3 token blocks x 2 layer-group sizes = 6`
 - `S2` variants: `3 token blocks = 3`
-- `S3` variants: `3 layer blocks = 3` (not 9—`L` is a separate sweep axis)
+- `S3` variants: `3 layer blocks = 3`
 
 Total **strategy-parameter variants:** `6 + 3 + 3 = 12`
 

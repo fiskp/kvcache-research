@@ -1,0 +1,4 @@
+strategy,avg_p95_latency_ms,avg_chunk_success_rate,avg_overhead_ratio,weighted_score
+token_layer_group,8.4258,0.999242,0.999242,0.75
+layer_only,27.435,1.0,1.0,0.441676
+token_only,36.3583,1.0,1.0,0.25
