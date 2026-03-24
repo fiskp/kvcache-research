@@ -1,0 +1,36 @@
+{
+  "stage": "stage_a",
+  "strategies": [
+    "token_layer_group",
+    "token_only",
+    "layer_only"
+  ],
+  "num_peers": [
+    64
+  ],
+  "replication": [
+    2
+  ],
+  "churn_rates": [
+    0.0,
+    0.05
+  ],
+  "seq_lens": [
+    512
+  ],
+  "seeds": [
+    0,
+    1
+  ],
+  "decode_steps": 5,
+  "max_runs": 12,
+  "effective_total_runs": 12,
+  "constants": {
+    "id_bits": 16,
+    "k_bucket": 8,
+    "alpha": 3,
+    "per_hop_delay_ms": 1.0,
+    "base_transfer_ms": 0.2,
+    "bandwidth_mbps": 100.0
+  }
+}
