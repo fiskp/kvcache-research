@@ -1,0 +1,141 @@
+Using execution device: cpu
+Model dtype target: torch.float32
+Architecture: layers=22, heads=32, kv_heads=4, head_dim=64
+
+=== Sequence length: 8 ===
+Total KV size: 0.3438 MiB
+Bytes per token (all layers, K+V): 45056.00
+  Layer  0 | K (1, 4, 8, 64) (torch.float32, cpu) | V (1, 4, 8, 64) (torch.float32, cpu) | size=16.0 KiB
+  Layer  1 | K (1, 4, 8, 64) (torch.float32, cpu) | V (1, 4, 8, 64) (torch.float32, cpu) | size=16.0 KiB
+  Layer  2 | K (1, 4, 8, 64) (torch.float32, cpu) | V (1, 4, 8, 64) (torch.float32, cpu) | size=16.0 KiB
+  Layer  3 | K (1, 4, 8, 64) (torch.float32, cpu) | V (1, 4, 8, 64) (torch.float32, cpu) | size=16.0 KiB
+  Layer  4 | K (1, 4, 8, 64) (torch.float32, cpu) | V (1, 4, 8, 64) (torch.float32, cpu) | size=16.0 KiB
+  Layer  5 | K (1, 4, 8, 64) (torch.float32, cpu) | V (1, 4, 8, 64) (torch.float32, cpu) | size=16.0 KiB
+  Layer  6 | K (1, 4, 8, 64) (torch.float32, cpu) | V (1, 4, 8, 64) (torch.float32, cpu) | size=16.0 KiB
+  Layer  7 | K (1, 4, 8, 64) (torch.float32, cpu) | V (1, 4, 8, 64) (torch.float32, cpu) | size=16.0 KiB
+  Layer  8 | K (1, 4, 8, 64) (torch.float32, cpu) | V (1, 4, 8, 64) (torch.float32, cpu) | size=16.0 KiB
+  Layer  9 | K (1, 4, 8, 64) (torch.float32, cpu) | V (1, 4, 8, 64) (torch.float32, cpu) | size=16.0 KiB
+  Layer 10 | K (1, 4, 8, 64) (torch.float32, cpu) | V (1, 4, 8, 64) (torch.float32, cpu) | size=16.0 KiB
+  Layer 11 | K (1, 4, 8, 64) (torch.float32, cpu) | V (1, 4, 8, 64) (torch.float32, cpu) | size=16.0 KiB
+  Layer 12 | K (1, 4, 8, 64) (torch.float32, cpu) | V (1, 4, 8, 64) (torch.float32, cpu) | size=16.0 KiB
+  Layer 13 | K (1, 4, 8, 64) (torch.float32, cpu) | V (1, 4, 8, 64) (torch.float32, cpu) | size=16.0 KiB
+  Layer 14 | K (1, 4, 8, 64) (torch.float32, cpu) | V (1, 4, 8, 64) (torch.float32, cpu) | size=16.0 KiB
+  Layer 15 | K (1, 4, 8, 64) (torch.float32, cpu) | V (1, 4, 8, 64) (torch.float32, cpu) | size=16.0 KiB
+  Layer 16 | K (1, 4, 8, 64) (torch.float32, cpu) | V (1, 4, 8, 64) (torch.float32, cpu) | size=16.0 KiB
+  Layer 17 | K (1, 4, 8, 64) (torch.float32, cpu) | V (1, 4, 8, 64) (torch.float32, cpu) | size=16.0 KiB
+  Layer 18 | K (1, 4, 8, 64) (torch.float32, cpu) | V (1, 4, 8, 64) (torch.float32, cpu) | size=16.0 KiB
+  Layer 19 | K (1, 4, 8, 64) (torch.float32, cpu) | V (1, 4, 8, 64) (torch.float32, cpu) | size=16.0 KiB
+  Layer 20 | K (1, 4, 8, 64) (torch.float32, cpu) | V (1, 4, 8, 64) (torch.float32, cpu) | size=16.0 KiB
+  Layer 21 | K (1, 4, 8, 64) (torch.float32, cpu) | V (1, 4, 8, 64) (torch.float32, cpu) | size=16.0 KiB
+
+=== Sequence length: 32 ===
+Total KV size: 1.3750 MiB
+Bytes per token (all layers, K+V): 45056.00
+  Layer  0 | K (1, 4, 32, 64) (torch.float32, cpu) | V (1, 4, 32, 64) (torch.float32, cpu) | size=64.0 KiB
+  Layer  1 | K (1, 4, 32, 64) (torch.float32, cpu) | V (1, 4, 32, 64) (torch.float32, cpu) | size=64.0 KiB
+  Layer  2 | K (1, 4, 32, 64) (torch.float32, cpu) | V (1, 4, 32, 64) (torch.float32, cpu) | size=64.0 KiB
+  Layer  3 | K (1, 4, 32, 64) (torch.float32, cpu) | V (1, 4, 32, 64) (torch.float32, cpu) | size=64.0 KiB
+  Layer  4 | K (1, 4, 32, 64) (torch.float32, cpu) | V (1, 4, 32, 64) (torch.float32, cpu) | size=64.0 KiB
+  Layer  5 | K (1, 4, 32, 64) (torch.float32, cpu) | V (1, 4, 32, 64) (torch.float32, cpu) | size=64.0 KiB
+  Layer  6 | K (1, 4, 32, 64) (torch.float32, cpu) | V (1, 4, 32, 64) (torch.float32, cpu) | size=64.0 KiB
+  Layer  7 | K (1, 4, 32, 64) (torch.float32, cpu) | V (1, 4, 32, 64) (torch.float32, cpu) | size=64.0 KiB
+  Layer  8 | K (1, 4, 32, 64) (torch.float32, cpu) | V (1, 4, 32, 64) (torch.float32, cpu) | size=64.0 KiB
+  Layer  9 | K (1, 4, 32, 64) (torch.float32, cpu) | V (1, 4, 32, 64) (torch.float32, cpu) | size=64.0 KiB
+  Layer 10 | K (1, 4, 32, 64) (torch.float32, cpu) | V (1, 4, 32, 64) (torch.float32, cpu) | size=64.0 KiB
+  Layer 11 | K (1, 4, 32, 64) (torch.float32, cpu) | V (1, 4, 32, 64) (torch.float32, cpu) | size=64.0 KiB
+  Layer 12 | K (1, 4, 32, 64) (torch.float32, cpu) | V (1, 4, 32, 64) (torch.float32, cpu) | size=64.0 KiB
+  Layer 13 | K (1, 4, 32, 64) (torch.float32, cpu) | V (1, 4, 32, 64) (torch.float32, cpu) | size=64.0 KiB
+  Layer 14 | K (1, 4, 32, 64) (torch.float32, cpu) | V (1, 4, 32, 64) (torch.float32, cpu) | size=64.0 KiB
+  Layer 15 | K (1, 4, 32, 64) (torch.float32, cpu) | V (1, 4, 32, 64) (torch.float32, cpu) | size=64.0 KiB
+  Layer 16 | K (1, 4, 32, 64) (torch.float32, cpu) | V (1, 4, 32, 64) (torch.float32, cpu) | size=64.0 KiB
+  Layer 17 | K (1, 4, 32, 64) (torch.float32, cpu) | V (1, 4, 32, 64) (torch.float32, cpu) | size=64.0 KiB
+  Layer 18 | K (1, 4, 32, 64) (torch.float32, cpu) | V (1, 4, 32, 64) (torch.float32, cpu) | size=64.0 KiB
+  Layer 19 | K (1, 4, 32, 64) (torch.float32, cpu) | V (1, 4, 32, 64) (torch.float32, cpu) | size=64.0 KiB
+  Layer 20 | K (1, 4, 32, 64) (torch.float32, cpu) | V (1, 4, 32, 64) (torch.float32, cpu) | size=64.0 KiB
+  Layer 21 | K (1, 4, 32, 64) (torch.float32, cpu) | V (1, 4, 32, 64) (torch.float32, cpu) | size=64.0 KiB
+
+=== Sequence length: 128 ===
+Total KV size: 5.5000 MiB
+Bytes per token (all layers, K+V): 45056.00
+  Layer  0 | K (1, 4, 128, 64) (torch.float32, cpu) | V (1, 4, 128, 64) (torch.float32, cpu) | size=256.0 KiB
+  Layer  1 | K (1, 4, 128, 64) (torch.float32, cpu) | V (1, 4, 128, 64) (torch.float32, cpu) | size=256.0 KiB
+  Layer  2 | K (1, 4, 128, 64) (torch.float32, cpu) | V (1, 4, 128, 64) (torch.float32, cpu) | size=256.0 KiB
+  Layer  3 | K (1, 4, 128, 64) (torch.float32, cpu) | V (1, 4, 128, 64) (torch.float32, cpu) | size=256.0 KiB
+  Layer  4 | K (1, 4, 128, 64) (torch.float32, cpu) | V (1, 4, 128, 64) (torch.float32, cpu) | size=256.0 KiB
+  Layer  5 | K (1, 4, 128, 64) (torch.float32, cpu) | V (1, 4, 128, 64) (torch.float32, cpu) | size=256.0 KiB
+  Layer  6 | K (1, 4, 128, 64) (torch.float32, cpu) | V (1, 4, 128, 64) (torch.float32, cpu) | size=256.0 KiB
+  Layer  7 | K (1, 4, 128, 64) (torch.float32, cpu) | V (1, 4, 128, 64) (torch.float32, cpu) | size=256.0 KiB
+  Layer  8 | K (1, 4, 128, 64) (torch.float32, cpu) | V (1, 4, 128, 64) (torch.float32, cpu) | size=256.0 KiB
+  Layer  9 | K (1, 4, 128, 64) (torch.float32, cpu) | V (1, 4, 128, 64) (torch.float32, cpu) | size=256.0 KiB
+  Layer 10 | K (1, 4, 128, 64) (torch.float32, cpu) | V (1, 4, 128, 64) (torch.float32, cpu) | size=256.0 KiB
+  Layer 11 | K (1, 4, 128, 64) (torch.float32, cpu) | V (1, 4, 128, 64) (torch.float32, cpu) | size=256.0 KiB
+  Layer 12 | K (1, 4, 128, 64) (torch.float32, cpu) | V (1, 4, 128, 64) (torch.float32, cpu) | size=256.0 KiB
+  Layer 13 | K (1, 4, 128, 64) (torch.float32, cpu) | V (1, 4, 128, 64) (torch.float32, cpu) | size=256.0 KiB
+  Layer 14 | K (1, 4, 128, 64) (torch.float32, cpu) | V (1, 4, 128, 64) (torch.float32, cpu) | size=256.0 KiB
+  Layer 15 | K (1, 4, 128, 64) (torch.float32, cpu) | V (1, 4, 128, 64) (torch.float32, cpu) | size=256.0 KiB
+  Layer 16 | K (1, 4, 128, 64) (torch.float32, cpu) | V (1, 4, 128, 64) (torch.float32, cpu) | size=256.0 KiB
+  Layer 17 | K (1, 4, 128, 64) (torch.float32, cpu) | V (1, 4, 128, 64) (torch.float32, cpu) | size=256.0 KiB
+  Layer 18 | K (1, 4, 128, 64) (torch.float32, cpu) | V (1, 4, 128, 64) (torch.float32, cpu) | size=256.0 KiB
+  Layer 19 | K (1, 4, 128, 64) (torch.float32, cpu) | V (1, 4, 128, 64) (torch.float32, cpu) | size=256.0 KiB
+  Layer 20 | K (1, 4, 128, 64) (torch.float32, cpu) | V (1, 4, 128, 64) (torch.float32, cpu) | size=256.0 KiB
+  Layer 21 | K (1, 4, 128, 64) (torch.float32, cpu) | V (1, 4, 128, 64) (torch.float32, cpu) | size=256.0 KiB
+
+=== Sequence length: 512 ===
+Total KV size: 22.0000 MiB
+Bytes per token (all layers, K+V): 45056.00
+  Layer  0 | K (1, 4, 512, 64) (torch.float32, cpu) | V (1, 4, 512, 64) (torch.float32, cpu) | size=1024.0 KiB
+  Layer  1 | K (1, 4, 512, 64) (torch.float32, cpu) | V (1, 4, 512, 64) (torch.float32, cpu) | size=1024.0 KiB
+  Layer  2 | K (1, 4, 512, 64) (torch.float32, cpu) | V (1, 4, 512, 64) (torch.float32, cpu) | size=1024.0 KiB
+  Layer  3 | K (1, 4, 512, 64) (torch.float32, cpu) | V (1, 4, 512, 64) (torch.float32, cpu) | size=1024.0 KiB
+  Layer  4 | K (1, 4, 512, 64) (torch.float32, cpu) | V (1, 4, 512, 64) (torch.float32, cpu) | size=1024.0 KiB
+  Layer  5 | K (1, 4, 512, 64) (torch.float32, cpu) | V (1, 4, 512, 64) (torch.float32, cpu) | size=1024.0 KiB
+  Layer  6 | K (1, 4, 512, 64) (torch.float32, cpu) | V (1, 4, 512, 64) (torch.float32, cpu) | size=1024.0 KiB
+  Layer  7 | K (1, 4, 512, 64) (torch.float32, cpu) | V (1, 4, 512, 64) (torch.float32, cpu) | size=1024.0 KiB
+  Layer  8 | K (1, 4, 512, 64) (torch.float32, cpu) | V (1, 4, 512, 64) (torch.float32, cpu) | size=1024.0 KiB
+  Layer  9 | K (1, 4, 512, 64) (torch.float32, cpu) | V (1, 4, 512, 64) (torch.float32, cpu) | size=1024.0 KiB
+  Layer 10 | K (1, 4, 512, 64) (torch.float32, cpu) | V (1, 4, 512, 64) (torch.float32, cpu) | size=1024.0 KiB
+  Layer 11 | K (1, 4, 512, 64) (torch.float32, cpu) | V (1, 4, 512, 64) (torch.float32, cpu) | size=1024.0 KiB
+  Layer 12 | K (1, 4, 512, 64) (torch.float32, cpu) | V (1, 4, 512, 64) (torch.float32, cpu) | size=1024.0 KiB
+  Layer 13 | K (1, 4, 512, 64) (torch.float32, cpu) | V (1, 4, 512, 64) (torch.float32, cpu) | size=1024.0 KiB
+  Layer 14 | K (1, 4, 512, 64) (torch.float32, cpu) | V (1, 4, 512, 64) (torch.float32, cpu) | size=1024.0 KiB
+  Layer 15 | K (1, 4, 512, 64) (torch.float32, cpu) | V (1, 4, 512, 64) (torch.float32, cpu) | size=1024.0 KiB
+  Layer 16 | K (1, 4, 512, 64) (torch.float32, cpu) | V (1, 4, 512, 64) (torch.float32, cpu) | size=1024.0 KiB
+  Layer 17 | K (1, 4, 512, 64) (torch.float32, cpu) | V (1, 4, 512, 64) (torch.float32, cpu) | size=1024.0 KiB
+  Layer 18 | K (1, 4, 512, 64) (torch.float32, cpu) | V (1, 4, 512, 64) (torch.float32, cpu) | size=1024.0 KiB
+  Layer 19 | K (1, 4, 512, 64) (torch.float32, cpu) | V (1, 4, 512, 64) (torch.float32, cpu) | size=1024.0 KiB
+  Layer 20 | K (1, 4, 512, 64) (torch.float32, cpu) | V (1, 4, 512, 64) (torch.float32, cpu) | size=1024.0 KiB
+  Layer 21 | K (1, 4, 512, 64) (torch.float32, cpu) | V (1, 4, 512, 64) (torch.float32, cpu) | size=1024.0 KiB
+
+=== Sequence length: 1024 ===
+Total KV size: 44.0000 MiB
+Bytes per token (all layers, K+V): 45056.00
+  Layer  0 | K (1, 4, 1024, 64) (torch.float32, cpu) | V (1, 4, 1024, 64) (torch.float32, cpu) | size=2048.0 KiB
+  Layer  1 | K (1, 4, 1024, 64) (torch.float32, cpu) | V (1, 4, 1024, 64) (torch.float32, cpu) | size=2048.0 KiB
+  Layer  2 | K (1, 4, 1024, 64) (torch.float32, cpu) | V (1, 4, 1024, 64) (torch.float32, cpu) | size=2048.0 KiB
+  Layer  3 | K (1, 4, 1024, 64) (torch.float32, cpu) | V (1, 4, 1024, 64) (torch.float32, cpu) | size=2048.0 KiB
+  Layer  4 | K (1, 4, 1024, 64) (torch.float32, cpu) | V (1, 4, 1024, 64) (torch.float32, cpu) | size=2048.0 KiB
+  Layer  5 | K (1, 4, 1024, 64) (torch.float32, cpu) | V (1, 4, 1024, 64) (torch.float32, cpu) | size=2048.0 KiB
+  Layer  6 | K (1, 4, 1024, 64) (torch.float32, cpu) | V (1, 4, 1024, 64) (torch.float32, cpu) | size=2048.0 KiB
+  Layer  7 | K (1, 4, 1024, 64) (torch.float32, cpu) | V (1, 4, 1024, 64) (torch.float32, cpu) | size=2048.0 KiB
+  Layer  8 | K (1, 4, 1024, 64) (torch.float32, cpu) | V (1, 4, 1024, 64) (torch.float32, cpu) | size=2048.0 KiB
+  Layer  9 | K (1, 4, 1024, 64) (torch.float32, cpu) | V (1, 4, 1024, 64) (torch.float32, cpu) | size=2048.0 KiB
+  Layer 10 | K (1, 4, 1024, 64) (torch.float32, cpu) | V (1, 4, 1024, 64) (torch.float32, cpu) | size=2048.0 KiB
+  Layer 11 | K (1, 4, 1024, 64) (torch.float32, cpu) | V (1, 4, 1024, 64) (torch.float32, cpu) | size=2048.0 KiB
+  Layer 12 | K (1, 4, 1024, 64) (torch.float32, cpu) | V (1, 4, 1024, 64) (torch.float32, cpu) | size=2048.0 KiB
+  Layer 13 | K (1, 4, 1024, 64) (torch.float32, cpu) | V (1, 4, 1024, 64) (torch.float32, cpu) | size=2048.0 KiB
+  Layer 14 | K (1, 4, 1024, 64) (torch.float32, cpu) | V (1, 4, 1024, 64) (torch.float32, cpu) | size=2048.0 KiB
+  Layer 15 | K (1, 4, 1024, 64) (torch.float32, cpu) | V (1, 4, 1024, 64) (torch.float32, cpu) | size=2048.0 KiB
+  Layer 16 | K (1, 4, 1024, 64) (torch.float32, cpu) | V (1, 4, 1024, 64) (torch.float32, cpu) | size=2048.0 KiB
+  Layer 17 | K (1, 4, 1024, 64) (torch.float32, cpu) | V (1, 4, 1024, 64) (torch.float32, cpu) | size=2048.0 KiB
+  Layer 18 | K (1, 4, 1024, 64) (torch.float32, cpu) | V (1, 4, 1024, 64) (torch.float32, cpu) | size=2048.0 KiB
+  Layer 19 | K (1, 4, 1024, 64) (torch.float32, cpu) | V (1, 4, 1024, 64) (torch.float32, cpu) | size=2048.0 KiB
+  Layer 20 | K (1, 4, 1024, 64) (torch.float32, cpu) | V (1, 4, 1024, 64) (torch.float32, cpu) | size=2048.0 KiB
+  Layer 21 | K (1, 4, 1024, 64) (torch.float32, cpu) | V (1, 4, 1024, 64) (torch.float32, cpu) | size=2048.0 KiB
+
+=== TinyLLaMA summary table (batch_size=1) ===
+seq_len,total_kv_bytes_llama,kv_bytes_per_token_llama,kv_bytes_per_layer_llama
+8,360448,45056.00,16384.00
+32,1441792,45056.00,65536.00
+128,5767168,45056.00,262144.00
+512,23068672,45056.00,1048576.00
+1024,46137344,45056.00,2097152.00
