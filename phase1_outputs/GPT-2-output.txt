@@ -1,0 +1,90 @@
+Using device: cpu
+Model dtype: torch.float32
+
+=== Sequence length target: 8, actual tokens: 8 ===
+Total KV size: 0.5625 MiB
+Bytes per token (all layers, K+V): 73728.00 bytes
+  Layer  0 | K shape (1, 12, 8, 64), V shape (1, 12, 8, 64), dtype=torch.float32, size=48.0 KiB
+  Layer  1 | K shape (1, 12, 8, 64), V shape (1, 12, 8, 64), dtype=torch.float32, size=48.0 KiB
+  Layer  2 | K shape (1, 12, 8, 64), V shape (1, 12, 8, 64), dtype=torch.float32, size=48.0 KiB
+  Layer  3 | K shape (1, 12, 8, 64), V shape (1, 12, 8, 64), dtype=torch.float32, size=48.0 KiB
+  Layer  4 | K shape (1, 12, 8, 64), V shape (1, 12, 8, 64), dtype=torch.float32, size=48.0 KiB
+  Layer  5 | K shape (1, 12, 8, 64), V shape (1, 12, 8, 64), dtype=torch.float32, size=48.0 KiB
+  Layer  6 | K shape (1, 12, 8, 64), V shape (1, 12, 8, 64), dtype=torch.float32, size=48.0 KiB
+  Layer  7 | K shape (1, 12, 8, 64), V shape (1, 12, 8, 64), dtype=torch.float32, size=48.0 KiB
+  Layer  8 | K shape (1, 12, 8, 64), V shape (1, 12, 8, 64), dtype=torch.float32, size=48.0 KiB
+  Layer  9 | K shape (1, 12, 8, 64), V shape (1, 12, 8, 64), dtype=torch.float32, size=48.0 KiB
+  Layer 10 | K shape (1, 12, 8, 64), V shape (1, 12, 8, 64), dtype=torch.float32, size=48.0 KiB
+  Layer 11 | K shape (1, 12, 8, 64), V shape (1, 12, 8, 64), dtype=torch.float32, size=48.0 KiB
+
+=== Sequence length target: 32, actual tokens: 32 ===
+Total KV size: 2.2500 MiB
+Bytes per token (all layers, K+V): 73728.00 bytes
+  Layer  0 | K shape (1, 12, 32, 64), V shape (1, 12, 32, 64), dtype=torch.float32, size=192.0 KiB
+  Layer  1 | K shape (1, 12, 32, 64), V shape (1, 12, 32, 64), dtype=torch.float32, size=192.0 KiB
+  Layer  2 | K shape (1, 12, 32, 64), V shape (1, 12, 32, 64), dtype=torch.float32, size=192.0 KiB
+  Layer  3 | K shape (1, 12, 32, 64), V shape (1, 12, 32, 64), dtype=torch.float32, size=192.0 KiB
+  Layer  4 | K shape (1, 12, 32, 64), V shape (1, 12, 32, 64), dtype=torch.float32, size=192.0 KiB
+  Layer  5 | K shape (1, 12, 32, 64), V shape (1, 12, 32, 64), dtype=torch.float32, size=192.0 KiB
+  Layer  6 | K shape (1, 12, 32, 64), V shape (1, 12, 32, 64), dtype=torch.float32, size=192.0 KiB
+  Layer  7 | K shape (1, 12, 32, 64), V shape (1, 12, 32, 64), dtype=torch.float32, size=192.0 KiB
+  Layer  8 | K shape (1, 12, 32, 64), V shape (1, 12, 32, 64), dtype=torch.float32, size=192.0 KiB
+  Layer  9 | K shape (1, 12, 32, 64), V shape (1, 12, 32, 64), dtype=torch.float32, size=192.0 KiB
+  Layer 10 | K shape (1, 12, 32, 64), V shape (1, 12, 32, 64), dtype=torch.float32, size=192.0 KiB
+  Layer 11 | K shape (1, 12, 32, 64), V shape (1, 12, 32, 64), dtype=torch.float32, size=192.0 KiB
+
+=== Sequence length target: 128, actual tokens: 122 ===
+Total KV size: 8.5781 MiB
+Bytes per token (all layers, K+V): 73728.00 bytes
+  Layer  0 | K shape (1, 12, 122, 64), V shape (1, 12, 122, 64), dtype=torch.float32, size=732.0 KiB
+  Layer  1 | K shape (1, 12, 122, 64), V shape (1, 12, 122, 64), dtype=torch.float32, size=732.0 KiB
+  Layer  2 | K shape (1, 12, 122, 64), V shape (1, 12, 122, 64), dtype=torch.float32, size=732.0 KiB
+  Layer  3 | K shape (1, 12, 122, 64), V shape (1, 12, 122, 64), dtype=torch.float32, size=732.0 KiB
+  Layer  4 | K shape (1, 12, 122, 64), V shape (1, 12, 122, 64), dtype=torch.float32, size=732.0 KiB
+  Layer  5 | K shape (1, 12, 122, 64), V shape (1, 12, 122, 64), dtype=torch.float32, size=732.0 KiB
+  Layer  6 | K shape (1, 12, 122, 64), V shape (1, 12, 122, 64), dtype=torch.float32, size=732.0 KiB
+  Layer  7 | K shape (1, 12, 122, 64), V shape (1, 12, 122, 64), dtype=torch.float32, size=732.0 KiB
+  Layer  8 | K shape (1, 12, 122, 64), V shape (1, 12, 122, 64), dtype=torch.float32, size=732.0 KiB
+  Layer  9 | K shape (1, 12, 122, 64), V shape (1, 12, 122, 64), dtype=torch.float32, size=732.0 KiB
+  Layer 10 | K shape (1, 12, 122, 64), V shape (1, 12, 122, 64), dtype=torch.float32, size=732.0 KiB
+  Layer 11 | K shape (1, 12, 122, 64), V shape (1, 12, 122, 64), dtype=torch.float32, size=732.0 KiB
+
+=== Sequence length target: 512, actual tokens: 485 ===
+Total KV size: 34.1016 MiB
+Bytes per token (all layers, K+V): 73728.00 bytes
+  Layer  0 | K shape (1, 12, 485, 64), V shape (1, 12, 485, 64), dtype=torch.float32, size=2910.0 KiB
+  Layer  1 | K shape (1, 12, 485, 64), V shape (1, 12, 485, 64), dtype=torch.float32, size=2910.0 KiB
+  Layer  2 | K shape (1, 12, 485, 64), V shape (1, 12, 485, 64), dtype=torch.float32, size=2910.0 KiB
+  Layer  3 | K shape (1, 12, 485, 64), V shape (1, 12, 485, 64), dtype=torch.float32, size=2910.0 KiB
+  Layer  4 | K shape (1, 12, 485, 64), V shape (1, 12, 485, 64), dtype=torch.float32, size=2910.0 KiB
+  Layer  5 | K shape (1, 12, 485, 64), V shape (1, 12, 485, 64), dtype=torch.float32, size=2910.0 KiB
+  Layer  6 | K shape (1, 12, 485, 64), V shape (1, 12, 485, 64), dtype=torch.float32, size=2910.0 KiB
+  Layer  7 | K shape (1, 12, 485, 64), V shape (1, 12, 485, 64), dtype=torch.float32, size=2910.0 KiB
+  Layer  8 | K shape (1, 12, 485, 64), V shape (1, 12, 485, 64), dtype=torch.float32, size=2910.0 KiB
+  Layer  9 | K shape (1, 12, 485, 64), V shape (1, 12, 485, 64), dtype=torch.float32, size=2910.0 KiB
+  Layer 10 | K shape (1, 12, 485, 64), V shape (1, 12, 485, 64), dtype=torch.float32, size=2910.0 KiB
+  Layer 11 | K shape (1, 12, 485, 64), V shape (1, 12, 485, 64), dtype=torch.float32, size=2910.0 KiB
+
+=== Sequence length target: 1024, actual tokens: 969 ===
+Total KV size: 68.1328 MiB
+Bytes per token (all layers, K+V): 73728.00 bytes
+  Layer  0 | K shape (1, 12, 969, 64), V shape (1, 12, 969, 64), dtype=torch.float32, size=5814.0 KiB
+  Layer  1 | K shape (1, 12, 969, 64), V shape (1, 12, 969, 64), dtype=torch.float32, size=5814.0 KiB
+  Layer  2 | K shape (1, 12, 969, 64), V shape (1, 12, 969, 64), dtype=torch.float32, size=5814.0 KiB
+  Layer  3 | K shape (1, 12, 969, 64), V shape (1, 12, 969, 64), dtype=torch.float32, size=5814.0 KiB
+  Layer  4 | K shape (1, 12, 969, 64), V shape (1, 12, 969, 64), dtype=torch.float32, size=5814.0 KiB
+  Layer  5 | K shape (1, 12, 969, 64), V shape (1, 12, 969, 64), dtype=torch.float32, size=5814.0 KiB
+  Layer  6 | K shape (1, 12, 969, 64), V shape (1, 12, 969, 64), dtype=torch.float32, size=5814.0 KiB
+  Layer  7 | K shape (1, 12, 969, 64), V shape (1, 12, 969, 64), dtype=torch.float32, size=5814.0 KiB
+  Layer  8 | K shape (1, 12, 969, 64), V shape (1, 12, 969, 64), dtype=torch.float32, size=5814.0 KiB
+  Layer  9 | K shape (1, 12, 969, 64), V shape (1, 12, 969, 64), dtype=torch.float32, size=5814.0 KiB
+  Layer 10 | K shape (1, 12, 969, 64), V shape (1, 12, 969, 64), dtype=torch.float32, size=5814.0 KiB
+  Layer 11 | K shape (1, 12, 969, 64), V shape (1, 12, 969, 64), dtype=torch.float32, size=5814.0 KiB
+
+=== Summary table (batch_size=1) ===
+seq_len,total_kv_bytes,bytes_per_token,bytes_per_layer
+8,589824,73728.00,49152.00
+32,2359296,73728.00,196608.00
+122,8994816,73728.00,749568.00
+485,35758080,73728.00,2979840.00
+969,71442432,73728.00,5953536.00
