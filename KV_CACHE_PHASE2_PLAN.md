@@ -136,6 +136,25 @@ By comparing GPT-2 and TinyLLaMA, we can argue:
   - Load the chosen LLaMA-style model.
   - Produce layer-wise KV size reports across the agreed sequence lengths.
   - Emit comparable tables/plots to those from Phase 1.
+
+  **How to run** (from the repo root):
+
+  ```bash
+  python -m pip install -r requirements.txt
+  python scripts/kv_cache_phase2_tinyllama.py
+  ```
+
+  **Generated outputs**:
+  - `phase2_outputs/TinyLLaMA-output.txt`
+  - `phase2_outputs/tinyllama_kv_stats.csv`
+  - `phase2_outputs/tinyllama_kv_layer_stats.csv`
+  - `phase2_outputs/gpt2_kv_stats.csv`
+  - `phase2_outputs/gpt2_vs_tinyllama_kv_comparison.csv`
+  - `phase2_outputs/KV_CACHE_PHASE2_RESULTS.md`
+  - `phase2_outputs/figures/tinyllama_total_kv_vs_seq.png`
+  - `phase2_outputs/figures/tinyllama_kv_per_token_vs_seq.png`
+  - `phase2_outputs/figures/gpt2_vs_tinyllama_kv_per_token.png`
+  
 - **Doc:** A short comparative writeup including:
   - Empirical KV size tables for both GPT-2 and TinyLLaMA.
   - A distilled summary of architectural differences that matter for KV cache
@@ -143,4 +162,3 @@ By comparing GPT-2 and TinyLLaMA, we can argue:
   - Concrete rules of thumb, e.g. “Model X uses ~Y KB of KV cache per token at
     1k-token context length,” tied back to P2P-RAGCache’s capacity and replication
     decisions.
-
