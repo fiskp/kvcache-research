@@ -72,10 +72,10 @@ Known measured TinyLLaMA profile from Phase 2:
 
 ### S3: Layer Only
 
-- Chunk by layer blocks over a full sequence window.
-- Parameters:
-  - sequence length window: `{128, 512, 1024}`
-  - layer block: `{1, 2, 4}` (for realistic object sizes)
+- Chunk by layer blocks over the **active context**; each chunk spans all tokens in that run’s `L`.
+- **Strategy-parameter variants** (what the experiment runner encodes in `strategy_variants`):
+  - layer block: `{1, 2, 4}` → **3** variants
+- **Context length `L`** is **not** part of the S3 variant tuple. It is swept in the **same outer loop** as for S1 and S2 (`L ∈ {128, 512, 1024}` in Stage B / full matrix; fixed at `512` in Stage A). So each S3 variant is evaluated at each `L` like the others—without double-counting `L` inside the “12 variants” total.
 
 ---
 
@@ -93,29 +93,31 @@ Known measured TinyLLaMA profile from Phase 2:
 - **Context length (`L`):** `{128, 512, 1024}`
 - **Random seeds per config:** `10`
 
+**Alignment with code:** In [`scripts/experiment_tinyllama_kv_kademlia.py`](scripts/experiment_tinyllama_kv_kademlia.py), the cartesian product is **(strategy-parameter variant) × `N` × `R` × churn × `L` × seeds**. That yields **12** distinct split configurations before the network/churn/L/seed sweep.
+
 ## 5.2 Per-strategy variant counts
 
 - `S1` variants: `3 token blocks x 2 layer-group sizes = 6`
 - `S2` variants: `3 token blocks = 3`
-- `S3` variants: `3 sequence windows x 3 layer blocks = 9`
+- `S3` variants: `3 layer blocks = 3` (not 9—`L` is a separate sweep axis)
 
-Total strategy variants: `6 + 3 + 9 = 18`
+Total **strategy-parameter variants:** `6 + 3 + 3 = 12`
 
 ## 5.3 Total run count
 
-Each variant is evaluated across:
+Each of the 12 variants is evaluated across:
 
 - `N (3) x R (3) x churn (3) x L (3) x seeds (10) = 810 runs`
 
-Grand total:
+Grand total (full matrix):
 
-- `18 variants x 810 = 14,580 runs`
+- `12 variants x 810 = 9,720 runs`
 
 This is a full matrix for publishable rigor.
 
 ## 5.4 Staged execution plan (recommended)
 
-Because 14,580 runs is large, execute in 3 stages:
+Because 9,720 runs is large, execute in 3 stages:
 
 1. **Stage A (screening):**
    - `N={64}`, `R={2}`, churn=`{C0,C1}`, `L={512}`, seeds=`5`
@@ -143,23 +145,23 @@ Then:
 ### Example planning numbers
 
 - If `t_run = 0.8s`, `parallel_workers = 8`:
-  - `14,580 x 0.8 / 8 = 1,458s` (~24.3 min)
+  - `9,720 x 0.8 / 8 = 972s` (~16.2 min)
 - If `t_run = 2.0s`, `parallel_workers = 8`:
-  - `3,645s` (~60.8 min)
+  - `9,720 x 2 / 8 = 2,430s` (~40.5 min)
 - If `t_run = 5.0s`, `parallel_workers = 8`:
-  - `9,112.5s` (~2.53 hours)
+  - `9,720 x 5 / 8 = 6,075s` (~1.69 hours)
 
 ### Stage A expected runtime (small, quick)
 
 Stage A runs:
 
-- Variants: `18`
+- Strategy-parameter variants: `12`
 - Sweep points: `N=1, R=1, churn=2, L=1, seeds=5` -> `10` runs/variant
-- Total: `180 runs`
+- Total: `120 runs`
 
 At `t_run=2.0s`, `8` workers:
 
-- `180 x 2 / 8 = 45s` (plus setup and I/O)
+- `120 x 2 / 8 = 30s` (plus setup and I/O)
 
 ---
 
