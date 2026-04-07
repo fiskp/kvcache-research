@@ -306,3 +306,117 @@ python benchmark.py
 
 All results are deterministic (seeded ID/key generation).  The same numbers will reproduce
 on any machine.
+
+---
+
+# Milestone 2 Task 3 — KV Cache Serialization Layer: Design Decisions
+
+## 10. Serialization Context
+
+The KV cache profiling experiments (Phase 1 & 2) and splitting strategy tests used
+synthetic byte counts — no real tensor data flowed through the DHT.  The serialization
+layer bridges this gap by converting real TinyLLaMA KV tensors into a compact binary
+format for P2P storage and retrieval.
+
+---
+
+## 11. Serialization Design Decisions
+
+### 11.1 Binary format: fixed 64-byte header + raw payload
+
+**Decision:** Custom binary format with a 64-byte fixed header followed by contiguous
+tensor bytes.
+
+**Rationale:**
+- A fixed header is trivially parseable without any schema negotiation — critical for a
+  P2P setting where nodes need to inspect chunk metadata without deserializing the full
+  payload.
+- 64 bytes accommodates all current metadata (dimensions, compression, checksum) with
+  16 bytes reserved for future fields, avoiding format revisions for minor additions.
+- Raw contiguous bytes (C-order, batch dim squeezed) minimize serialization overhead
+  compared to pickle, safetensors, or protobuf — there is no schema parsing or pointer
+  chasing, just a memcpy into a pre-allocated tensor.
+
+**Trade-off acknowledged:** A self-describing format like safetensors would be more
+portable across models.  We chose speed and compactness because the format is internal
+to P2P-RAGCache and the header already captures all needed metadata.
+
+### 11.2 Chunk ID convention: pipe-delimited key-value strings
+
+**Decision:** Reuse the existing `m=tinyllama|l={seq_len}|s=...|ts=...|te=...|ls=...|le=...`
+format from `experiment_tinyllama_kv_kademlia.py`.
+
+**Rationale:**
+- Maintains backward compatibility with the splitting strategy experiments.
+- Human-readable for debugging — a chunk ID immediately tells you which model, sequence
+  range, and layer range it covers.
+- DHT keys are derived via `DHTNode.hash_key(chunk_id, 16)`, consistent with the existing
+  experiment infrastructure.
+
+### 11.3 Compression: optional lz4/zstd with graceful fallback
+
+**Decision:** Compression is a per-chunk option (header byte: 0=none, 1=lz4, 2=zstd).
+Dependencies are optional — compression calls raise `ImportError` with install
+instructions if the library is missing.
+
+**Rationale:**
+- KV cache data (float32 random-ish activations) compresses poorly (~1.0x for random
+  data, up to 1.2–1.5x for real inference outputs with repeated patterns).  Making
+  compression optional avoids mandatory latency overhead when the ratio is negligible.
+- LZ4 prioritizes speed (sub-millisecond for typical chunks); zstd offers better ratio
+  at higher latency.  Supporting both lets users choose per deployment.
+- Graceful `ImportError` means the core module works without extra dependencies —
+  important for CI and lightweight test environments.
+
+### 11.4 Integrity: MD5 checksum of uncompressed payload
+
+**Decision:** 16-byte MD5 digest stored in the header, computed on the uncompressed
+payload.
+
+**Rationale:**
+- MD5 is fast and its 128-bit output fits neatly in the header.  We need collision
+  detection (data corruption), not cryptographic security — MD5 is sufficient for this.
+- Checksumming the uncompressed data means a single verification step after decompression,
+  covering both transport corruption and decompression errors.
+
+**Trade-off acknowledged:** SHA-256 would be cryptographically stronger but adds 16 bytes
+to the header and ~2x checksum latency.  For an internal P2P cache (not adversarial),
+MD5 is appropriate.
+
+### 11.5 Chunking: token_block × layer_group grid
+
+**Decision:** `chunk_kv_cache()` splits along two dimensions: token positions
+(`token_block`, default 32) and layers (`layer_group`, default 2).
+
+**Rationale:**
+- Matches the "token_layer_group" strategy that the splitting experiments identified as
+  offering the best balance between chunk count and per-chunk size.
+- Small chunks (32 tokens × 2 layers ≈ 32 KB for TinyLLaMA float32) enable fine-grained
+  P2P distribution and partial cache reuse (e.g., reuse the first 256 tokens of a 512-token
+  prompt).
+- The grid structure makes reassembly straightforward — each chunk writes to a known
+  `[layer_start:layer_end, token_start:token_end]` slice of the output tensors.
+
+### 11.6 Reassembly: pre-allocate + scatter
+
+**Decision:** `reassemble_kv_cache()` pre-allocates full zero tensors and scatters chunk
+data into the correct slices.
+
+**Rationale:**
+- Pre-allocation avoids repeated concatenation (O(n²) memory copies).
+- Scatter writes are order-independent, so chunks can arrive from multiple DHT peers
+  in any order — a natural fit for Milestone 3's parallel fetching.
+- The batch dimension is restored (unsqueeze) to match the `(batch, heads, seq, dim)`
+  format expected by HuggingFace Transformers.
+
+---
+
+## 12. How to Reproduce (Serialization)
+
+```bash
+# Run serialization tests (21 tests)
+pytest tests/test_serialization.py -v -s
+
+# Run serialization benchmarks
+python scripts/benchmark_serialization.py
+```
