@@ -20,6 +20,13 @@ from .format import (
     encode_header,
     decode_header,
 )
+from .serialize import (
+    KVChunk,
+    chunk_kv_cache,
+    serialize_chunk,
+    deserialize_chunk,
+    reassemble_kv_cache,
+)
 
 __all__ = [
     "MAGIC",
@@ -36,4 +43,9 @@ __all__ = [
     "ChunkHeader",
     "encode_header",
     "decode_header",
+    "KVChunk",
+    "chunk_kv_cache",
+    "serialize_chunk",
+    "deserialize_chunk",
+    "reassemble_kv_cache",
 ]
