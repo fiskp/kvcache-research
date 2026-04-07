@@ -20,6 +20,8 @@ from kv_serialization.format import (
     HEADER_SIZE,
     MAGIC,
     COMPRESS_NONE,
+    COMPRESS_LZ4,
+    COMPRESS_ZSTD,
     DTYPE_F32,
     DTYPE_F16,
     ChunkHeader,
@@ -277,3 +279,64 @@ class TestReassemble:
         for k, v in rebuilt:
             assert k.shape[0] == 1  # batch dim
             assert v.shape[0] == 1
+
+
+# ── Compression tests ────────────────────────────────────────────────────
+
+def _has_lz4():
+    try:
+        import lz4.frame
+        return True
+    except ImportError:
+        return False
+
+
+def _has_zstd():
+    try:
+        import zstandard
+        return True
+    except ImportError:
+        return False
+
+
+class TestCompression:
+    @pytest.mark.skipif(not _has_lz4(), reason="lz4 not installed")
+    def test_lz4_roundtrip(self):
+        torch.manual_seed(99)
+        past_kv = make_fake_kv_cache(num_layers=4, seq_len=32)
+        chunks = chunk_kv_cache(past_kv, seq_len=32, token_block=16, layer_group=2)
+
+        for chunk in chunks:
+            data = serialize_chunk(chunk, compression=COMPRESS_LZ4)
+            restored = deserialize_chunk(data, chunk_id=chunk.chunk_id)
+
+            for k_orig, k_rest in zip(chunk.keys, restored.keys):
+                assert torch.equal(k_orig, k_rest)
+            for v_orig, v_rest in zip(chunk.values, restored.values):
+                assert torch.equal(v_orig, v_rest)
+
+    @pytest.mark.skipif(not _has_lz4(), reason="lz4 not installed")
+    def test_lz4_compressed_smaller(self):
+        """LZ4 compressed data should differ in size from uncompressed."""
+        past_kv = make_fake_kv_cache(num_layers=2, seq_len=64)
+        chunks = chunk_kv_cache(past_kv, seq_len=64, token_block=64, layer_group=2)
+
+        raw = serialize_chunk(chunks[0], compression=COMPRESS_NONE)
+        compressed = serialize_chunk(chunks[0], compression=COMPRESS_LZ4)
+        # Random data won't compress well, but sizes should differ
+        assert len(compressed) != len(raw)
+
+    @pytest.mark.skipif(not _has_zstd(), reason="zstandard not installed")
+    def test_zstd_roundtrip(self):
+        torch.manual_seed(99)
+        past_kv = make_fake_kv_cache(num_layers=4, seq_len=32)
+        chunks = chunk_kv_cache(past_kv, seq_len=32, token_block=16, layer_group=2)
+
+        for chunk in chunks:
+            data = serialize_chunk(chunk, compression=COMPRESS_ZSTD)
+            restored = deserialize_chunk(data, chunk_id=chunk.chunk_id)
+
+            for k_orig, k_rest in zip(chunk.keys, restored.keys):
+                assert torch.equal(k_orig, k_rest)
+            for v_orig, v_rest in zip(chunk.values, restored.values):
+                assert torch.equal(v_orig, v_rest)
