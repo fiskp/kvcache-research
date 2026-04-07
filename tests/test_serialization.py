@@ -340,3 +340,106 @@ class TestCompression:
                 assert torch.equal(k_orig, k_rest)
             for v_orig, v_rest in zip(chunk.values, restored.values):
                 assert torch.equal(v_orig, v_rest)
+
+
+# ── Kademlia integration tests ───────────────────────────────────────────
+
+from dht_comparison.base import NetworkSimulator, generate_node_ids, DHTNode
+from dht_comparison.kademlia import KademliaNode
+from kv_serialization.integration import store_kv_chunk, retrieve_kv_chunk
+
+KAD_ID_BITS = 16
+
+
+def build_kademlia_network(num_nodes=10):
+    """Build a stabilized Kademlia network for testing."""
+    network = NetworkSimulator()
+    node_ids = generate_node_ids(num_nodes, KAD_ID_BITS)
+    nodes = []
+
+    for nid in node_ids:
+        node = KademliaNode(nid, network, KAD_ID_BITS)
+        bootstrap = nodes[0].node_id if nodes else None
+        node.join(bootstrap)
+        nodes.append(node)
+
+    for _ in range(max(num_nodes * 3, 30)):
+        for node in nodes:
+            node.stabilize()
+
+    return network, nodes
+
+
+class TestKademliaIntegration:
+    def test_store_and_retrieve(self):
+        """Store a chunk via one node, retrieve via another."""
+        torch.manual_seed(42)
+        _, nodes = build_kademlia_network(10)
+
+        past_kv = make_fake_kv_cache(num_layers=4, seq_len=32)
+        chunks = chunk_kv_cache(past_kv, seq_len=32, token_block=16, layer_group=2)
+
+        chunk = chunks[0]
+        dht_key, bytes_stored = store_kv_chunk(nodes[0], chunk)
+        assert bytes_stored > HEADER_SIZE
+
+        # Retrieve from a different node
+        restored = retrieve_kv_chunk(nodes[5], chunk.chunk_id)
+
+        assert restored.chunk_id == chunk.chunk_id
+        assert restored.layer_start == chunk.layer_start
+        assert restored.layer_end == chunk.layer_end
+        for k_orig, k_rest in zip(chunk.keys, restored.keys):
+            assert torch.equal(k_orig, k_rest)
+        for v_orig, v_rest in zip(chunk.values, restored.values):
+            assert torch.equal(v_orig, v_rest)
+
+    def test_store_all_chunks_and_reassemble(self):
+        """Full pipeline: chunk → store → retrieve → reassemble."""
+        torch.manual_seed(77)
+        _, nodes = build_kademlia_network(10)
+
+        num_layers, seq_len = 6, 32
+        past_kv = make_fake_kv_cache(num_layers=num_layers, seq_len=seq_len)
+        chunks = chunk_kv_cache(past_kv, seq_len=seq_len, token_block=16, layer_group=2)
+
+        # Store all chunks
+        for chunk in chunks:
+            store_kv_chunk(nodes[0], chunk)
+
+        # Retrieve all chunks from a different node
+        retrieved = []
+        for chunk in chunks:
+            retrieved.append(retrieve_kv_chunk(nodes[7], chunk.chunk_id))
+
+        rebuilt = reassemble_kv_cache(
+            retrieved, num_layers=num_layers, seq_len=seq_len,
+            num_kv_heads=4, head_dim=64,
+        )
+
+        for layer_idx in range(num_layers):
+            k_orig, v_orig = past_kv[layer_idx]
+            k_rebuilt, v_rebuilt = rebuilt[layer_idx]
+            assert torch.equal(k_orig, k_rebuilt)
+            assert torch.equal(v_orig, v_rebuilt)
+
+    def test_retrieve_missing_chunk_raises(self):
+        _, nodes = build_kademlia_network(5)
+        with pytest.raises(KeyError, match="not found"):
+            retrieve_kv_chunk(nodes[0], "m=tinyllama|l=512|s=token_layer_group|tb=32|lg=2|ts=0|te=32|ls=0|le=2")
+
+    @pytest.mark.skipif(not _has_lz4(), reason="lz4 not installed")
+    def test_store_compressed(self):
+        """Store with LZ4 compression, retrieve and verify."""
+        torch.manual_seed(55)
+        _, nodes = build_kademlia_network(10)
+
+        past_kv = make_fake_kv_cache(num_layers=2, seq_len=16)
+        chunks = chunk_kv_cache(past_kv, seq_len=16, token_block=16, layer_group=2)
+
+        chunk = chunks[0]
+        dht_key, bytes_stored = store_kv_chunk(nodes[0], chunk, compression=COMPRESS_LZ4)
+
+        restored = retrieve_kv_chunk(nodes[3], chunk.chunk_id)
+        for k_orig, k_rest in zip(chunk.keys, restored.keys):
+            assert torch.equal(k_orig, k_rest)

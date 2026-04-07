@@ -27,6 +27,10 @@ from .serialize import (
     deserialize_chunk,
     reassemble_kv_cache,
 )
+from .integration import (
+    store_kv_chunk,
+    retrieve_kv_chunk,
+)
 
 __all__ = [
     "MAGIC",
@@ -48,4 +52,6 @@ __all__ = [
     "serialize_chunk",
     "deserialize_chunk",
     "reassemble_kv_cache",
+    "store_kv_chunk",
+    "retrieve_kv_chunk",
 ]
