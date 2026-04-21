@@ -567,6 +567,71 @@ def build_weighted_ranking(summary_rows: List[Dict[str, Any]]) -> List[Dict[str,
     return rows
 
 
+def variant_key(row: Dict[str, Any]) -> str:
+    """Canonical string key for a (strategy, parameter) variant."""
+    parts = [str(row["strategy"])]
+    if row.get("token_block") not in (None, ""):
+        parts.append(f"tb={row['token_block']}")
+    if row.get("layer_group_size") not in (None, ""):
+        parts.append(f"lg={row['layer_group_size']}")
+    if row.get("layer_block_size") not in (None, ""):
+        parts.append(f"lb={row['layer_block_size']}")
+    return "|".join(parts)
+
+
+def aggregate_by_variant(summary_rows: List[Dict[str, Any]]) -> Dict[str, Dict[str, float]]:
+    grouped: Dict[str, List[Dict[str, Any]]] = {}
+    for row in summary_rows:
+        grouped.setdefault(variant_key(row), []).append(row)
+    result: Dict[str, Dict[str, float]] = {}
+    for k, rows in grouped.items():
+        result[k] = {
+            "p95_latency": statistics.mean(float(r["decode_step_latency_ms_p95"]) for r in rows),
+            "availability": statistics.mean(float(r["chunk_success_rate"]) for r in rows),
+            "overhead": statistics.mean(float(r["bytes_overhead_ratio"]) for r in rows),
+        }
+    return result
+
+
+def build_variant_ranking(summary_rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    agg = aggregate_by_variant(summary_rows)
+    p95 = {k: v["p95_latency"] for k, v in agg.items()}
+    avail = {k: v["availability"] for k, v in agg.items()}
+    overhead = {k: v["overhead"] for k, v in agg.items()}
+
+    p95_score = normalized_score(p95, lower_is_better=True)
+    avail_score = normalized_score(avail, lower_is_better=False)
+    overhead_score = normalized_score(overhead, lower_is_better=True)
+
+    rows = []
+    for k in agg:
+        total = 0.60 * p95_score[k] + 0.25 * avail_score[k] + 0.15 * overhead_score[k]
+        rows.append(
+            {
+                "variant": k,
+                "avg_p95_latency_ms": round(agg[k]["p95_latency"], 4),
+                "avg_chunk_success_rate": round(agg[k]["availability"], 6),
+                "avg_overhead_ratio": round(agg[k]["overhead"], 6),
+                "weighted_score": round(total, 6),
+            }
+        )
+    rows.sort(key=lambda r: r["weighted_score"], reverse=True)
+    return rows
+
+
+def load_top_variants(prev_dir: Path, top_n: int) -> List[str]:
+    """Read summary_metrics.csv from a previous stage and return top_n variant keys."""
+    metrics_path = prev_dir / "summary_metrics.csv"
+    if not metrics_path.exists():
+        raise FileNotFoundError(f"No summary_metrics.csv found in {prev_dir}")
+    rows: List[Dict[str, Any]] = []
+    with metrics_path.open("r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        rows = list(reader)
+    ranking = build_variant_ranking(rows)
+    return [r["variant"] for r in ranking[:top_n]]
+
+
 def plot_results(summary_rows: List[Dict[str, Any]], figures_dir: Path) -> None:
     figures_dir.mkdir(parents=True, exist_ok=True)
     by_strategy = aggregate_by_strategy(summary_rows)
@@ -627,12 +692,86 @@ def plot_results(summary_rows: List[Dict[str, Any]], figures_dir: Path) -> None:
     plt.savefig(figures_dir / "overhead_vs_replication.png", dpi=220)
     plt.close()
 
+    plot_variant_results(summary_rows, figures_dir)
+
+
+def plot_variant_results(summary_rows: List[Dict[str, Any]], figures_dir: Path) -> None:
+    """Per-variant plots — produced for Stage B/C where multiple parameter configs are compared."""
+    by_variant = aggregate_by_variant(summary_rows)
+    if len(by_variant) <= 1:
+        return
+
+    variants = list(by_variant.keys())
+    figures_dir.mkdir(parents=True, exist_ok=True)
+
+    p95_vals = [by_variant[v]["p95_latency"] for v in variants]
+    plt.figure(figsize=(max(8, len(variants) * 1.5), 5))
+    plt.bar(range(len(variants)), p95_vals)
+    plt.xticks(range(len(variants)), variants, rotation=20, ha="right", fontsize=8)
+    plt.title("p95 Latency by Variant")
+    plt.ylabel("Latency (ms)")
+    plt.tight_layout()
+    plt.savefig(figures_dir / "latency_p95_by_variant.png", dpi=220)
+    plt.close()
+
+    seq_lens = sorted({int(r["seq_len"]) for r in summary_rows})
+    if len(seq_lens) > 1:
+        variant_seqlen: Dict[str, Dict[int, List[float]]] = {}
+        for row in summary_rows:
+            vk = variant_key(row)
+            sl = int(row["seq_len"])
+            variant_seqlen.setdefault(vk, {}).setdefault(sl, []).append(
+                float(row["decode_step_latency_ms_p95"])
+            )
+        plt.figure(figsize=(8, 5))
+        for vk in variants:
+            ys = [
+                statistics.mean(variant_seqlen[vk].get(sl, [float("nan")]))
+                for sl in seq_lens
+            ]
+            plt.plot(seq_lens, ys, marker="o", label=vk)
+        plt.title("p95 Latency vs Sequence Length by Variant")
+        plt.xlabel("Sequence length (tokens)")
+        plt.ylabel("p95 latency (ms)")
+        plt.legend(fontsize=7)
+        plt.grid(True, alpha=0.3)
+        plt.tight_layout()
+        plt.savefig(figures_dir / "latency_vs_seq_len_by_variant.png", dpi=220)
+        plt.close()
+
+    num_peers_vals = sorted({int(r["num_peers"]) for r in summary_rows})
+    if len(num_peers_vals) > 1:
+        variant_peers: Dict[str, Dict[int, List[float]]] = {}
+        for row in summary_rows:
+            vk = variant_key(row)
+            n = int(row["num_peers"])
+            variant_peers.setdefault(vk, {}).setdefault(n, []).append(
+                float(row["decode_step_latency_ms_p95"])
+            )
+        plt.figure(figsize=(8, 5))
+        for vk in variants:
+            ys = [
+                statistics.mean(variant_peers[vk].get(n, [float("nan")]))
+                for n in num_peers_vals
+            ]
+            plt.plot(num_peers_vals, ys, marker="o", label=vk)
+        plt.title("p95 Latency vs Network Size by Variant")
+        plt.xlabel("Number of peers")
+        plt.ylabel("p95 latency (ms)")
+        plt.legend(fontsize=7)
+        plt.grid(True, alpha=0.3)
+        plt.tight_layout()
+        plt.savefig(figures_dir / "latency_vs_num_peers_by_variant.png", dpi=220)
+        plt.close()
+
 
 def build_report(
     output_dir: Path,
     summary_rows: List[Dict[str, Any]],
     ranking_rows: List[Dict[str, Any]],
     run_config: Dict[str, Any],
+    variant_ranking_rows: Optional[List[Dict[str, Any]]] = None,
+    selected_variants: Optional[List[str]] = None,
 ) -> None:
     lines: List[str] = []
     lines.append("# TinyLLaMA KV Splitting with Kademlia - Experiment Report\n")
@@ -644,9 +783,12 @@ def build_report(
     lines.append(f"- Replication factors: `{run_config['replication']}`")
     lines.append(f"- Churn rates: `{run_config['churn_rates']}`")
     lines.append(f"- Sequence lengths: `{run_config['seq_lens']}`")
-    lines.append(f"- Seeds: `{run_config['seeds']}`\n")
+    lines.append(f"- Seeds: `{run_config['seeds']}`")
+    if selected_variants:
+        lines.append(f"- Variants selected from previous stage: `{', '.join(selected_variants)}`")
+    lines.append("")
 
-    lines.append("## Weighted ranking (60% latency, 25% availability, 15% overhead)")
+    lines.append("## Strategy-level ranking (60% latency, 25% availability, 15% overhead)")
     lines.append("| strategy | avg_p95_latency_ms | avg_chunk_success_rate | avg_overhead_ratio | weighted_score |")
     lines.append("|---|---:|---:|---:|---:|")
     for row in ranking_rows:
@@ -657,7 +799,21 @@ def build_report(
         )
     lines.append("")
 
-    if ranking_rows:
+    if variant_ranking_rows:
+        lines.append("## Variant-level ranking (60% latency, 25% availability, 15% overhead)")
+        lines.append("| variant | avg_p95_latency_ms | avg_chunk_success_rate | avg_overhead_ratio | weighted_score |")
+        lines.append("|---|---:|---:|---:|---:|")
+        for row in variant_ranking_rows:
+            lines.append(
+                f"| {row['variant']} | {row['avg_p95_latency_ms']:.4f} | "
+                f"{row['avg_chunk_success_rate']:.6f} | {row['avg_overhead_ratio']:.6f} | "
+                f"{row['weighted_score']:.6f} |"
+            )
+        lines.append("")
+        winner_variant = variant_ranking_rows[0]["variant"]
+        lines.append("## Recommended variant")
+        lines.append(f"- Winner: `{winner_variant}` based on configured weighted scoring.\n")
+    elif ranking_rows:
         winner = ranking_rows[0]["strategy"]
         lines.append("## Recommended strategy")
         lines.append(f"- Winner: `{winner}` based on configured weighted scoring.\n")
@@ -668,10 +824,14 @@ def build_report(
     lines.append("- `access_trace.csv`")
     lines.append("- `summary_metrics.csv`")
     lines.append("- `weighted_ranking.csv`")
+    lines.append("- `variant_ranking.csv`")
     lines.append("- `figures/latency_p95_by_strategy.png`")
     lines.append("- `figures/latency_vs_churn.png`")
     lines.append("- `figures/availability_vs_churn.png`")
     lines.append("- `figures/overhead_vs_replication.png`")
+    lines.append("- `figures/latency_p95_by_variant.png` (Stage B/C only)")
+    lines.append("- `figures/latency_vs_seq_len_by_variant.png` (Stage B/C only)")
+    lines.append("- `figures/latency_vs_num_peers_by_variant.png` (Stage B/C only)")
     lines.append("")
 
     (output_dir / "REPORT.md").write_text("\n".join(lines).strip() + "\n", encoding="utf-8")
@@ -720,6 +880,17 @@ def build_matrix(stage: str, seeds: int) -> Dict[str, Any]:
             "seeds": list(range(seeds)),
             "decode_steps": 5,
         }
+    elif stage == "stage_c":
+        run_cfg = {
+            "stage": stage,
+            "strategies": STRATEGIES,
+            "num_peers": [32, 64, 128],
+            "replication": [1, 2, 3],
+            "churn_rates": [0.0, 0.05, 0.15],
+            "seq_lens": [128, 512, 1024],
+            "seeds": list(range(20)),
+            "decode_steps": 5,
+        }
     elif stage == "full":
         run_cfg = {
             "stage": stage,
@@ -732,14 +903,29 @@ def build_matrix(stage: str, seeds: int) -> Dict[str, Any]:
             "decode_steps": 8,
         }
     else:
-        raise ValueError("stage must be one of: stage_a, stage_b, full")
+        raise ValueError("stage must be one of: stage_a, stage_b, stage_c, full")
     return run_cfg
 
 
-def iter_experiment_configs(run_cfg: Dict[str, Any], max_runs: Optional[int]) -> Iterable[ExperimentConfig]:
+def iter_experiment_configs(
+    run_cfg: Dict[str, Any],
+    max_runs: Optional[int],
+    allowed_variants: Optional[List[str]] = None,
+) -> Iterable[ExperimentConfig]:
+    allowed_set = set(allowed_variants) if allowed_variants is not None else None
     idx = 0
     for strategy in run_cfg["strategies"]:
         for variant in strategy_variants(strategy):
+            vk = variant_key(
+                {
+                    "strategy": strategy,
+                    "token_block": variant["token_block"] or "",
+                    "layer_group_size": variant["layer_group_size"] or "",
+                    "layer_block_size": variant["layer_block_size"] or "",
+                }
+            )
+            if allowed_set is not None and vk not in allowed_set:
+                continue
             for n in run_cfg["num_peers"]:
                 for r in run_cfg["replication"]:
                     for churn in run_cfg["churn_rates"]:
@@ -770,7 +956,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--stage",
-        choices=["stage_a", "stage_b", "full"],
+        choices=["stage_a", "stage_b", "stage_c", "full"],
         default="stage_a",
         help="Experiment stage preset.",
     )
@@ -778,7 +964,7 @@ def parse_args() -> argparse.Namespace:
         "--seeds",
         type=int,
         default=5,
-        help="Number of seeds per config (full forces at least 10).",
+        help="Number of seeds per config (stage_c forces 20, full forces at least 10).",
     )
     parser.add_argument(
         "--max-runs",
@@ -792,6 +978,24 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="Optional output directory. Defaults to kv_kademlia_experiments/<timestamp>.",
     )
+    parser.add_argument(
+        "--prev-stage-dir",
+        type=str,
+        default=None,
+        help=(
+            "Path to a previous stage output directory. "
+            "Used by stage_b/stage_c to filter to the top variants from that stage."
+        ),
+    )
+    parser.add_argument(
+        "--top-variants",
+        type=int,
+        default=None,
+        help=(
+            "Number of top variants to promote from --prev-stage-dir. "
+            "Defaults to 5 for stage_b and 2 for stage_c."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -800,6 +1004,23 @@ def main() -> None:
     repo_root = Path(__file__).resolve().parents[1]
     profile = load_tinyllama_profile(repo_root)
     run_cfg = build_matrix(args.stage, args.seeds)
+
+    # Resolve top-variant filtering for stage_b / stage_c
+    allowed_variants: Optional[List[str]] = None
+    selected_variants: Optional[List[str]] = None
+    if args.prev_stage_dir is not None:
+        top_n = args.top_variants or (5 if args.stage == "stage_b" else 2)
+        prev_dir = Path(args.prev_stage_dir)
+        selected_variants = load_top_variants(prev_dir, top_n)
+        allowed_variants = selected_variants
+        print(f"Filtering to top {top_n} variants from {prev_dir}:")
+        for vk in selected_variants:
+            print(f"  {vk}")
+    elif args.stage in ("stage_b", "stage_c"):
+        print(
+            f"Warning: running {args.stage} without --prev-stage-dir; "
+            "all 12 strategy variants will be included."
+        )
 
     if args.output_dir:
         output_dir = Path(args.output_dir)
@@ -814,7 +1035,7 @@ def main() -> None:
     placement_rows_all: List[Dict[str, Any]] = []
     access_rows_all: List[Dict[str, Any]] = []
 
-    configs = list(iter_experiment_configs(run_cfg, args.max_runs))
+    configs = list(iter_experiment_configs(run_cfg, args.max_runs, allowed_variants))
     total = len(configs)
     for i, cfg in enumerate(configs, start=1):
         print(
@@ -829,19 +1050,26 @@ def main() -> None:
         access_rows_all.extend(result["access_rows"])
 
     ranking_rows = build_weighted_ranking(summary_rows)
+    variant_ranking_rows = build_variant_ranking(summary_rows)
 
     csv_write(output_dir / "chunk_catalog.csv", chunk_rows_all)
     csv_write(output_dir / "placement.csv", placement_rows_all)
     csv_write(output_dir / "access_trace.csv", access_rows_all)
     csv_write(output_dir / "summary_metrics.csv", summary_rows)
     csv_write(output_dir / "weighted_ranking.csv", ranking_rows)
+    csv_write(output_dir / "variant_ranking.csv", variant_ranking_rows)
     plot_results(summary_rows, output_dir / "figures")
-    build_report(output_dir, summary_rows, ranking_rows, run_cfg)
+    build_report(
+        output_dir, summary_rows, ranking_rows, run_cfg,
+        variant_ranking_rows=variant_ranking_rows,
+        selected_variants=selected_variants,
+    )
 
     config_out = {
         **run_cfg,
         "max_runs": args.max_runs,
         "effective_total_runs": len(summary_rows),
+        "selected_variants": selected_variants,
         "constants": {
             "id_bits": ID_BITS,
             "k_bucket": K_BUCKET,
