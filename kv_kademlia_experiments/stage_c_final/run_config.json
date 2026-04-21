@@ -1,0 +1,65 @@
+{
+  "stage": "stage_c",
+  "strategies": [
+    "token_layer_group",
+    "token_only",
+    "layer_only"
+  ],
+  "num_peers": [
+    32,
+    64,
+    128
+  ],
+  "replication": [
+    1,
+    2,
+    3
+  ],
+  "churn_rates": [
+    0.0,
+    0.05,
+    0.15
+  ],
+  "seq_lens": [
+    128,
+    512,
+    1024
+  ],
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+  ],
+  "decode_steps": 5,
+  "max_runs": null,
+  "effective_total_runs": 3240,
+  "selected_variants": [
+    "token_layer_group|tb=32|lg=2",
+    "token_layer_group|tb=32|lg=4"
+  ],
+  "constants": {
+    "id_bits": 16,
+    "k_bucket": 8,
+    "alpha": 3,
+    "per_hop_delay_ms": 1.0,
+    "base_transfer_ms": 0.2,
+    "bandwidth_mbps": 100.0
+  }
+}

@@ -1,0 +1,6 @@
+variant,avg_p95_latency_ms,avg_chunk_success_rate,avg_overhead_ratio,weighted_score
+token_layer_group|tb=32|lg=2,4.9195,0.996621,0.996621,0.85
+token_layer_group|tb=32|lg=4,6.1968,0.992846,0.992672,0.734249
+token_layer_group|tb=64|lg=2,6.2752,0.991505,0.991505,0.711972
+token_layer_group|tb=64|lg=4,8.819,0.991052,0.991176,0.551063
+layer_only|lb=1,14.8359,0.987486,0.987486,0.15
