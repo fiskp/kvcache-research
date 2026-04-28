@@ -4,3 +4,5 @@ __pycache__/
 figures/
 .claude/
 *.log
+access_trace.csv
+placement.csv
